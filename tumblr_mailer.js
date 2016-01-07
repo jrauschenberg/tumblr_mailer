@@ -15,7 +15,6 @@ var csvParse = function(data) {
     arrofobjects[i-1]['numMonthsSinceContact'] = info[2];
     arrofobjects[i-1]['emailAddress'] = info[3];
   };
-  console.log(arrofobjects);
   return arrofobjects;
 }
 
@@ -32,33 +31,11 @@ var client = tumblr.createClient({
 
 var emailTemplate = fs.readFileSync('email_template.ejs', 'utf8');
 
-//getting all first names
-/*function firstget() {
-  var names = [];
-  for (var i=0; i<friendlist.length; i++) {
-    names.push(friendlist[i].firstName);
-  }
-  return names;
-}
-
-var firstName = firstget();
-
-//getting all numMonthsSinceContact
-/*function contactget() {
-  var contact = [];
-  for (var i=0; i<friendlist.length; i++) {
-    contact.push(friendlist[i].numMonthsSinceContact);
-  }
-  return contact;
-}*/
-
-var firstName, numMonthsSinceContact;
-
 var personalizer = function() {
   var templateCopy = emailTemplate;
-  for (var k=0; k<friendlist.length; k++) {
-    firstName = friendlist[k]['firstName']
-    numMonthsSinceContact = friendlist[k]["numMonthsSinceContact"];
+  friendlist.forEach(function(index) {
+    var firstName = index.firstName;
+    var numMonthsSinceContact = index.numMonthsSinceContact;
     client.posts('attempt101c.tumblr.com', function(err, blog){
     var latestPosts = [];
     for (var j=0; j<blog.posts.length; j++) {
@@ -66,15 +43,14 @@ var personalizer = function() {
         latestPosts.push(blog.posts[j]);
       }
     }
-    console.log(ejs.render(emailTemplate, {
+    var customizedTemplate = ejs.render(emailTemplate, {
     firstName: firstName,
     numMonthsSinceContact: numMonthsSinceContact,
     latestPosts: latestPosts
-    }));
+    });
+    console.log(customizedTemplate);
     
+    })
+
   })
-
-  }
-};
-
-personalizer();
+}();
